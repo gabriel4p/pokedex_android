@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#EF6F6C</color>
+    <color name="colorPrimaryDark">#B73B3B</color>
+    <color name="colorAccent">#FF4081</color>
+    <color name="fundoPokemon">#CCCCCC</color>
+    <color name="pbVoid">#006600</color>
+    <color name="pbFill">#00CC00</color>
+</resources>
