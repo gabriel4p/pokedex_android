@@ -5,5 +5,10 @@ package br.com.cursoandroid.pokedex.models;
  */
 
 public class Constantes {
-    public static final String ERRO_REDE = "ErroRede";
+    public static final String ERRO_NETWORK = "Network";
+    public static final String ERRO_NOT_FOUND = "NotFound";
+    public static final String ERRO_UNKNOWN = "Unknown";
+    public static final String FILE_POKEMON = "FilePokemon";
+    public static final String BANCO_SEM_REGISTROS = "BancoSemRegistros";
+    public static final String URL_POKEAPI = "http://pokeapi.co/api/v2/pokemon";
 }

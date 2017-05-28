@@ -6,7 +6,7 @@
         android:title="Buscar"
         android:icon="@drawable/ic_search"
         app:showAsAction="always"
-        
+
         android:actionViewClass="android.widget.SearchView">
     </item>
 </menu>

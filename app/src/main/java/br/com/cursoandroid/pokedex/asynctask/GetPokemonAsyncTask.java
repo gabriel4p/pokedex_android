@@ -1,34 +1,39 @@
 package br.com.cursoandroid.pokedex.asynctask;
 
+import android.content.res.Resources;
 import android.os.AsyncTask;
-import android.util.Log;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.util.ArrayList;
 
 import br.com.cursoandroid.pokedex.MainActivity;
+import br.com.cursoandroid.pokedex.contract.PokemonAsyncTaskHandler;
+import br.com.cursoandroid.pokedex.models.Constantes;
+import br.com.cursoandroid.pokedex.models.Erro;
 import br.com.cursoandroid.pokedex.models.Pokemon;
+import br.com.cursoandroid.pokedex.repository.PokemonRepository;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 
 public class GetPokemonAsyncTask extends AsyncTask <Integer, Void, JSONObject>{
 
-    private final String TAG_CATEGORY = "GetPokemonAsyncTask";
+    private PokemonAsyncTaskHandler pokemonHandler;
 
-    MainActivity activity;
-
-    public GetPokemonAsyncTask(MainActivity activity){
-        this.activity = activity;
+    public GetPokemonAsyncTask(PokemonAsyncTaskHandler pokemonHandler){
+        this.pokemonHandler = pokemonHandler;
     }
 
     @Override
     protected JSONObject doInBackground(Integer... params) {
         Integer id = params[0];
-        String url = String.format("http://pokeapi.co/api/v2/pokemon/%s", id);
+        String url = String.format("%s/%s", Constantes.URL_POKEAPI, id);
         JSONObject jsonObject = null;
+        Erro erro = null;
 
         OkHttpClient client = new OkHttpClient();
         Request request = new Request
@@ -39,26 +44,46 @@ public class GetPokemonAsyncTask extends AsyncTask <Integer, Void, JSONObject>{
             Response response = client.newCall(request).execute();
             String json = response.body().string();
             jsonObject = new JSONObject(json);
+            if (jsonObject.has("detail") && jsonObject.getString("detail").equals("Not found.")){
+                throw new Resources.NotFoundException("Pokemon Not Found");
+            }
+
+            JSONObject jsonSprites = new JSONObject(jsonObject.getString("sprites"));
+            jsonObject.put("sprite", jsonSprites.getString("front_default"));
+            JSONArray arrayTipos = jsonObject.getJSONArray("types");
+            JSONArray tipos = new JSONArray();
+            for(int i = 0; i < arrayTipos.length(); i++){
+                JSONObject typeJson = arrayTipos.getJSONObject(i).getJSONObject("type");
+                tipos.put(typeJson.getString("name"));
+            }
+            jsonObject.put("tipos", tipos);
+
+        } catch (Resources.NotFoundException e){
+            erro = new Erro(e, Constantes.ERRO_NOT_FOUND);
         } catch (IOException e) {
-            Log.e("ERROR HTTP", e.getMessage());
-            e.printStackTrace();
+            erro = new Erro(e, Constantes.ERRO_NETWORK);
         } catch (JSONException e) {
-            Log.e("JSON EXCEPTION", e.getMessage());
+            erro = new Erro(e, Constantes.ERRO_UNKNOWN);
+        }
+
+        if(erro != null){
+            pokemonHandler.tratarErro(erro);
+            jsonObject = null;
         }
 
         return jsonObject;
     }
 
-
     protected void onPostExecute(JSONObject jsonObject){
 
         try {
-            Pokemon pokemon = null;
-            if(jsonObject != null)
-                pokemon = new Pokemon(jsonObject);
-            activity.preencherDados(pokemon);
+            if(jsonObject != null){
+                Pokemon pokemon = new Pokemon();
+                pokemon.fromJson(jsonObject);
+                pokemonHandler.receberPokemon(pokemon);
+            }
         } catch (Exception e) {
-            Log.e(TAG_CATEGORY, e.getMessage(), e);
+            pokemonHandler.tratarErro(new Erro(e, Constantes.ERRO_UNKNOWN));
         }
     }
 }

@@ -13,24 +13,22 @@ public class Pokemon {
     private String nome;
     private int altura;
     private int peso;
+    private int experiencia;
     private List<String> tipos;
 
-    public Pokemon(JSONObject jsonPokemon){
-        try {
-            JSONObject jsonSprites = new JSONObject(jsonPokemon.getString("sprites"));
-            this.id = jsonPokemon.getInt("id");
-            this.urlImagem = jsonSprites.getString("front_default");
-            this.nome = jsonPokemon.getString("name");
-            this.altura = jsonPokemon.getInt("height");
-            this.peso = jsonPokemon.getInt("weight");
-            JSONArray arrayTipos = jsonPokemon.getJSONArray("types");
-            tipos = new ArrayList<>();
-            for(int i = 0; i < arrayTipos.length(); i++){
-                JSONObject typeJson = arrayTipos.getJSONObject(i).getJSONObject("type");
-                tipos.add(typeJson.getString("name"));
-            }
-        } catch (JSONException e) {
-            e.printStackTrace();
+    public Pokemon() { }
+
+    public void fromJson(JSONObject jsonPokemon) throws JSONException {
+        this.id = jsonPokemon.getInt("id");
+        urlImagem = jsonPokemon.getString("sprite");
+        this.nome = jsonPokemon.getString("name");
+        this.altura = jsonPokemon.getInt("height");
+        this.peso = jsonPokemon.getInt("weight");
+        this.experiencia = jsonPokemon.getInt("base_experience");
+        JSONArray arrayTipos = jsonPokemon.getJSONArray("tipos");
+        tipos = new ArrayList<>();
+        for(int i = 0; i < arrayTipos.length(); i++){
+            tipos.add(arrayTipos.getString(i));
         }
     }
 
@@ -70,6 +68,8 @@ public class Pokemon {
         return peso;
     }
 
+    public double getPesoKilos() { return (double)peso/1000; }
+
     public void setPeso(int peso) {
         this.peso = peso;
     }
@@ -86,5 +86,29 @@ public class Pokemon {
 
     public void setTipos(List<String> tipos) {
         this.tipos = tipos;
+    }
+
+    public int getExperience() { return this.experiencia; }
+
+    public String toJson(){
+        JSONObject jsonObject = new JSONObject();
+        try {
+            jsonObject.put("id", this.id);
+            jsonObject.put("name", this.nome);
+            jsonObject.put("height", this.altura);
+            jsonObject.put("weight", this.peso);
+            jsonObject.put("base_experience", this.experiencia);
+            jsonObject.put("sprite", this.urlImagem);
+
+            JSONArray jsonArray = new JSONArray();
+            for(String tipo : tipos)
+                jsonArray.put(tipo);
+
+            jsonObject.put("tipos", jsonArray);
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return jsonObject.toString();
     }
 }
