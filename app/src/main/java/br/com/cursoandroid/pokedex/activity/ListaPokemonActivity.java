@@ -1,4 +1,4 @@
-package br.com.cursoandroid.pokedex.activitity;
+package br.com.cursoandroid.pokedex.activity;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;

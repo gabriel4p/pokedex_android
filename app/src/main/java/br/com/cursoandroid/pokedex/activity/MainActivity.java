@@ -1,10 +1,11 @@
-package br.com.cursoandroid.pokedex.activitity;
+package br.com.cursoandroid.pokedex.activity;
 
-import android.app.ProgressDialog;
+import android.app.SearchManager;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.CardView;
+import android.support.v7.widget.SearchView;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -76,27 +77,38 @@ public class MainActivity extends BaseActivity implements PokemonAsyncTaskHandle
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater menuInflater = getMenuInflater();
         menuInflater.inflate(R.menu.main_menu, menu);
+
+        MenuItem searchItem = menu.findItem(R.id.action_search);
+        SearchView searchView = null;
+        if(searchItem != null){
+            searchView = (SearchView) searchItem.getActionView();
+        }
+
+        if(searchView != null){
+            searchView.setQueryHint("Identificador");
+            final SearchView searchViewFinal = searchView;
+            searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener(){
+                @Override
+                public boolean onQueryTextSubmit(String query) {
+                    searchViewFinal.clearFocus();
+                    buscarPokemon(query);
+                    return false;
+                }
+
+                @Override
+                public boolean onQueryTextChange(String newText) { return false; }
+            });
+        }
+
         return true;
     }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch(item.getItemId()){
-            case R.id.itemBusca:
-                llBusca.setVisibility(View.VISIBLE);
-                return true;
-        }
-        return super.onOptionsItemSelected(item);
-    }
-
-    public void buscarPokemon(View view){
+    public void buscarPokemon(String identificador){
         int id = 0;
 
         try{
-            id = Integer.parseInt(txtBusca.getText().toString());
+            id = Integer.parseInt(identificador);
         }catch(Exception e) { }
-
-        txtBusca.setText("");
 
         if(id == 0)
             return;

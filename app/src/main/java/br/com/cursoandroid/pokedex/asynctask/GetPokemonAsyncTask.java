@@ -8,14 +8,11 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
-import java.util.ArrayList;
 
-import br.com.cursoandroid.pokedex.MainActivity;
 import br.com.cursoandroid.pokedex.contract.PokemonAsyncTaskHandler;
 import br.com.cursoandroid.pokedex.models.Constantes;
 import br.com.cursoandroid.pokedex.models.Erro;
 import br.com.cursoandroid.pokedex.models.Pokemon;
-import br.com.cursoandroid.pokedex.repository.PokemonRepository;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;

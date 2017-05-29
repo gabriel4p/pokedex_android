@@ -1,4 +1,4 @@
-package br.com.cursoandroid.pokedex.activitity;
+package br.com.cursoandroid.pokedex.activity;
 
 import android.app.ProgressDialog;
 import android.os.Bundle;
